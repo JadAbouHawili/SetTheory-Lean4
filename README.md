@@ -7,5 +7,6 @@ Useful for:
 
 # Usage
 The following guide uses `mathematics_in_lean` as an example but is relevant to any project in general:
+
 https://leanprover-community.github.io/install/project.html#working-on-an-existing-project
 
