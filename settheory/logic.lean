@@ -59,9 +59,6 @@ Q
 then `apply h` will change the goal from `Q` to `P` , because proving `P` would give you `Q`.
 -/
 
-#print Xor'
-#check Xor'
-#check not_xor
 
 #check not_iff
 #check and_iff_not_or_not

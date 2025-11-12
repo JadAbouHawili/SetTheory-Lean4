@@ -1,6 +1,6 @@
 
-import mathlibtesting.MathlibTheorems
-import mathlibtesting.settheory.univ
+import settheory.MathlibTheorems
+import settheory.auxiliary.univ
 
 theorem is_singleton
 {K : Type}
@@ -60,7 +60,7 @@ theorem full_singleton
 {K : Type}
 {S : Finset K} 
 {A B : K}
-(singleton : S={B})
+(singleton : S = { B })
 (AinS: A ∈ S)
 (AneB : A ≠ B)
 : False := by {

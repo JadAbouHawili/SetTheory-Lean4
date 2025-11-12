@@ -1,5 +1,5 @@
 
-import mathlibtesting.MathlibTheorems
+import settheory.MathlibTheorems
 
 -- coe
 #check Set.toFinset

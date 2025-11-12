@@ -1,65 +1,32 @@
-import mathlibtesting.MathlibTheorems
+import settheory.MathlibTheorems
 
-example
-{K : Type}
-  (A B C: K) (all3 : ∀(x : K), x = A ∨ x = B ∨ x = C) : @Set.univ K = {A,B,C} := by
-  unfold Set.univ
-  exact (Set.eq_univ_of_univ_subset fun ⦃a⦄ a_1 => all3 a).symm
-
-  --apply Set.ext
-  --intro x
-  --constructor
-  --sorry
-  --sorry
-
-  --· intro xUniv
-  --  by_contra
-  --· exact fun a => trivial
-
-
-
-
-
-#check instDecidableEqBool
 
 #check Finset.univ_inter
-#check Finset.empty_inter
-#check Finset.Nonempty
-#check Finset.empty
-#check not_iff_not.mpr Finset.not_nonempty_iff_eq_empty
-#check Finset.not_nonempty_iff_eq_empty.mpr
 
 -- go from set to finset
-theorem univ_iff_all {K : Type} {inst : Fintype K} {inst2 : DecidableEq K} {A B C : K}   : Finset.univ = ({A,B,C} : Finset K) ↔  ∀ (x : K), x = A ∨ x = B ∨ x = C:= by 
+
+theorem univ_iff_all {K : Type} {inst : Fintype K} {inst2 : DecidableEq K} {A B C : K}
+: Finset.univ = ({A,B,C} : Finset K) ↔  ∀ (x : K), x = A ∨ x = B ∨ x = C:= by 
 
   constructor
-  · intro U
-    intro x
+  · intro U x
     have this:= Finset.mem_univ x
     rw [U] at this
     mem_finset at this
     assumption
-  · intro U
-    apply Finset.ext
-    intro a
-    constructor
-    · intro aU
-      rcases U a with h|h
-      · rw [h]
-        exact Finset.mem_insert_self A {B, C}
-      · rcases h with h_1|h_1
-        · rw [h_1]
-          is_mem
-        · rw [h_1]
-          is_mem
-    · exact fun a_1 => Finset.mem_univ a
-
-
+  · --aesop
+    intro U
+    ext a
+    mem_finset
+    simp
+    exact U a
 
 theorem univ_iff_all2
-{K : Type}
-{inst : Fintype K} {inst2 : DecidableEq K} {A B : K}   : Finset.univ = ({A,B} : Finset K) ↔  ∀ (x : K), x = A ∨ x = B := by
+{K : Type} {inst : Fintype K} {inst2 : DecidableEq K}
+{A B : K} : Finset.univ = ({A,B} : Finset K) ↔  ∀ (x : K), x = A ∨ x = B := by
+
   constructor
+  -- repeated reasoning, make into a theorem or tactic
   ·
     intro U
     intro x
@@ -114,8 +81,6 @@ theorem set_subset_univ_explicit
 macro "by_universe" : tactic =>
   `(tactic| (apply set_subset_univ_explicit; assumption))
 
-
-
 -- replace to mem_set logic, prefer mem_set
 ---------------------------------------
 -- Set
@@ -152,117 +117,69 @@ theorem backward
 {K : Type}
 {A B C : K} (h : (Set.univ)  = ({A,B,C} : Set K) ):  ∀ (x : K), x = A ∨ x = B ∨ x = C:= by 
   intro x
-  have : x ∈ Set.univ := by exact trivial
+  have : x ∈ Set.univ := by trivial
   rw [h] at this
   exact this
 
+#check Set.eq_univ_of_univ_subset
+#check Set.eq_of_forall_subset_iff
+#check Set.eq_of_forall_subset_iff
 theorem univ_or
 {K : Type}
 {A B C : K} :  (Set.univ)  = ({A,B,C} : Set K)  ↔  ∀ (x : K), x = A ∨ x = B ∨ x = C:= by 
   constructor
   exact fun a x => backward a x
-  #check forward
-  exact forward
 
+  aesop?
+  --exact forward
 
+#check iff_mpr_iff_true_intro
+#check iff_of_true
+#check Set.eq_univ_of_univ_subset
+example
+{K : Type}
+  (A B C : K) (all3 : ∀ (x : K), x = A ∨ x = B ∨ x = C) : @Set.univ K = {A,B,C} := by
 
+  --ext x
+  --constructor
+  --· intro xUniv
+  --  exact all3 x
+  --· exact fun a => trivial
 
+  --aesop
 
+  --ext x
+  --constructor
+  --aesop
+  --aesop
 
+  ext y
+  apply iff_of_true
+  trivial
+  exact all3 y
 
+  --simp_all
+  --simp only [Set.mem_univ, Set.mem_insert_iff, Set.mem_singleton_iff]
+  --aesop?
 
-
-
-
-
-
-
-
-
-
-
-
-
---------------------------------------------------------------------------------------------------------------
-
--- can use to intuitively explain other things like x ∈ {A} means x=A etc.. start from it and then say more generally ...
--- mem1_iff_or for x ∈ {A}
--- mem2_iff_or for x ∈ {A,B} , can use repeat rw way
+---------------------------------------------------------
 
 -- try using Set.univ as an axiom instead and see if there are any advantages
-#check Finset.univ
-
-theorem mem_iff_or 
-{K : Type}
-(A B C: K) (x : K) : x ∈ ({A,B,C} : Set K) ↔  x = A ∨ x =B ∨ x = C := by
-  constructor
-  · intro xIn
-    exact xIn
-  · intro Ors
-    exact Ors
-
-theorem mem2_iff_or_finset
-{K : Type}
-{inst : DecidableEq K} 
-{A B : K} {x : K} : x ∈ ({A,B} : Finset K) ↔  x = A ∨ x =B := by
-  constructor
-  · intro xIn
-    mem_finset at xIn
-    assumption
-  · intro xIn
-    mem_finset
-    assumption
-
-theorem mem_iff_or_finset
-{K : Type}
-{inst : DecidableEq K}
-{A B C: K} {x : K} : x ∈ ({A,B,C} : Finset K) ↔  x = A ∨ x =B ∨ x = C := by
-  constructor
-  · intro xIn
-    mem_finset at xIn
-    assumption
-  · intro Ors
-    mem_finset
-    assumption
-
-
-
-
-
-theorem univ_set_iff_or 
-{K : Type}
-{x : K}
-{inst : DecidableEq K} {A B C : K} 
-{inst3 : DecidableEq Bool}
-{inst2 : Fintype K}
-: (x = A ∨ x = B ∨ x = C) ↔ x ∈ ({A,B,C} : Finset K) := by 
-  #check univ_iff_all
-  --rw [univ_iff_all inst2 inst] 
-  constructor 
-  · 
-    #check mem_iff_or
-    intro ors
-    have := (@mem_iff_or_finset _ inst _ _ _ x).mpr ors
-    assumption
-    --exact fun a ↦ (fun {K} {inst} {A B C x} ↦ mem_iff_or_finset.mpr) a
-
-    --intro all
-    --have U : Finset.univ = {A, B, C} := (univ_iff_all inst2 inst).mpr (all)
-    --rw [←U]
-    --exact Finset.mem_univ x
-  · intro mem
-    exact mem_iff_or_finset.mp mem
-
-
 
 theorem every_elt_in_univ 
 {K : Type}
 {inst : DecidableEq K} {A B C : K} 
 {inst2 : Fintype K}
 {all : ∀ (x : K), x = A ∨ x = B ∨ x = C}
-: ∀(x:K), x ∈ ({A,B,C} : Finset K) := by 
-  --have : Finset.univ = {A,B,C} := univ_iff_all.mpr all
-  rw [(univ_iff_all).symm] at all
-  rw [←all]
+: ∀(x:K), x ∈ ({A,B,C} : Finset K) := by
+
+  --aesop
+  --intro x
+  --mem_finset
+  --exact all x
+
+
+  have : Finset.univ = {A,B,C} := univ_iff_all.mpr all
+  rw [←this]
   intro x
   exact Finset.mem_univ x

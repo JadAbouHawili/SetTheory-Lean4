@@ -1,6 +1,9 @@
-import mathlibtesting.MathlibTheorems
+import settheory.MathlibTheorems
+import settheory.setTheorems
 
-#check Xor
+
+#print Xor'
+#check Xor'
 #check not_xor
 /-
 def Xor' (a b : Prop) := (a ∧ ¬ b) ∨ (b ∧ ¬ a)
@@ -22,16 +25,14 @@ To rewrite `Xor'` in hypothesis `h`:
 rw [Xor'] at h
 ```
 
-
 # Xor
 To introduce Xor, introduce as the negation of if and only if. Xor is inequivalence, Xor is such that exactly one of the propositions is truei.e exclusive or. 
 -/
 
-
-
-
-theorem XorToOr_set {K : Type} {A : K} (S : Set K) (S' : Set K) (h : S ∩ S' = ∅) : Xor' (A ∈ S) (A ∈ S') ↔ A ∈ S ∨ A ∈ S' := by
-  rw [xor_iff_or_and_not_and] 
+theorem XorToOr_set 
+{K : Type} {A : K} (S : Set K) (S' : Set K) (h : S ∩ S' = ∅)
+: Xor' (A ∈ S) (A ∈ S') ↔ A ∈ S ∨ A ∈ S' := by
+  rw [xor_iff_or_and_not_and]
   rw [not_and_or]
   constructor
   intro a1
@@ -73,7 +74,7 @@ theorem XorToOr_Finset {Inhabitant : Type} {inst : DecidableEq Inhabitant}{S : F
     · left
       constructor
       assumption
-      intro 
+      intro
       contradiction
     · right
       constructor

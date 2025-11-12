@@ -1,7 +1,7 @@
-import mathlibtesting.MathlibTheorems
-import mathlibtesting.logic
-import mathlibtesting.settheory.singleton
-import mathlibtesting.setTheorems
+import settheory.MathlibTheorems
+import settheory.logic
+import settheory.auxiliary.singleton
+import settheory.setTheorems
 
 
 #check Finset.card_eq_one
@@ -119,7 +119,6 @@ theorem one_in_of_card_eq_one
         · exact not_in_of_singleton h BneC
         · exact mem_of_eq_singleton h
 
-
 theorem all2_in_one_other_empty 
 {K : Type}
 {A B : K}
@@ -132,15 +131,11 @@ theorem all2_in_one_other_empty
     intro a
     constructor
     · intro aSprime
-      exact mem2_iff_or_finset.mpr (all a)
-    · intro h 
-      #check mem2_iff_or_finset
-      rw [mem2_iff_or_finset] at h
-      rcases h with h|h
-      rw [h]
-      assumption
-      rw [h]
-      assumption
+      mem_finset
+      exact all a
+    · intro h
+      mem_finset at h
+      rcases h with h|h <;> (rw[h] ; assumption)
 
   rw [this] at h
   rw [Finset.inter_comm] at h
@@ -208,8 +203,7 @@ theorem S_union_S'_eq_univ
       intro b
       constructor
       · intro t
-        #check mem_iff_or_finset
-        rw [mem_iff_or_finset]
+        mem_finset
         exact all3 b
       · intro t
         #check Finset.mem_union 
@@ -268,7 +262,7 @@ theorem everyone_in_set_eq
     constructor
     · intro aKn
       rcases all3 a with h|h|h
-<;> rw [h] ; is_mem
+<;> rw [h] ; mem_finset
 
     · intro aIn
       rcases all3 a with h|h|h
@@ -280,11 +274,10 @@ theorem everyone_in_set_eq
   · intro SEveryone
     rw [SEveryone]
     constructor <;> try constructor
-    is_mem
-
+    mem_finset
 
 theorem all_in_one
-  {Inhabitant: Type}
+  {Inhabitant : Type}
   {inst : DecidableEq Inhabitant}
   {A B C : Inhabitant}
   {S : Finset Inhabitant} 
@@ -335,16 +328,16 @@ theorem already_full
   rcases either_single with h|h
   assumption
 
-  rw [h] at hA 
+  rw [h] at hA
   rw [Finset.mem_singleton] at hA
-  exfalso 
+  exfalso
   contradiction
 
 
-theorem full2_helper  
+theorem full2_helper
 {K : Type}
 {A B C : K}
-(S : Finset K) 
+(S : Finset K)
 {inst : DecidableEq K}
 {inst2 : Fintype K}
 (pair : S = {A,B})
@@ -357,7 +350,7 @@ theorem full2_helper
   rw [pair] at CinS
   mem_finset at CinS
 
-  cases CinS 
+  cases CinS
   symm at AneC
   contradiction
   symm at BneC
@@ -371,9 +364,9 @@ theorem full2
 (S : Finset K)
 {inst : DecidableEq K}
 {inst2 : Fintype K}
-(AinS: A ∈ S)
-(BinS: B ∈ S)
-(Two : S.card =2)
+(AinS : A ∈ S)
+(BinS : B ∈ S)
+(Two : S.card = 2)
 (AneB : A ≠ B)
 (BneC : B ≠ C)
 (AneC : A ≠ C)
@@ -413,7 +406,6 @@ theorem full2
     have : {A,B,C} ⊆ S := by
       intro x
       intro hx
-      #check mem_iff_or_finset
       rw [mem_iff_or_finset] at hx
       rcases hx  with h|h
       rw [←h] at AinS

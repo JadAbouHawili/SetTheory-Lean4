@@ -18,6 +18,8 @@ do`(tactic |  rw[ Finset.subset_insert_iff_of_not_mem] at $t1 <;> try assumption
 macro "remove_top" : tactic =>
 do`(tactic |  rw[ Finset.subset_insert_iff_of_not_mem] <;> try assumption)
 
+macro "perm" : tactic => `(tactic| (ext ; aesop))
+
 --hypothesis
 macro "remove_top" "at" t1:Lean.Parser.Tactic.locationHyp : tactic =>
 do`(tactic |  rw[ Set.subset_insert_iff_of_not_mem] at $t1 <;> try assumption)
@@ -28,17 +30,22 @@ do`(tactic |  rw[ Set.subset_insert_iff_of_not_mem] <;> try assumption)
 
 
 macro "mem_finset": tactic =>
-  do`(tactic| repeat simp only [Finset.mem_insert,Finset.mem_singleton] )
+  do`(tactic| repeat simp only [Finset.mem_insert,Finset.mem_singleton,true_or,or_true] )
 
 macro "mem_finset" "at" t1:Lean.Parser.Tactic.locationHyp : tactic =>
   do`(tactic| repeat simp only [Finset.mem_insert,Finset.mem_singleton] at $t1)
 
 #check Set.mem_singleton_iff
 #check Set.mem_singleton
+#check Set.mem_insert
+#check Finset.mem_singleton
+
+#check Set.mem_singleton_iff
+#check Set.mem_insert_iff
 macro "mem_set": tactic =>
-  do`(tactic| repeat simp only [Set.mem_insert,Set.mem_singleton] )
+  do`(tactic| repeat simp only [Set.mem_insert_iff,Set.mem_singleton_iff,true_or,or_true] )
 macro "mem_set" "at" t1:Lean.Parser.Tactic.locationHyp : tactic =>
-  do`(tactic| repeat simp only [Set.mem_insert,Set.mem_singleton] at $t1)
+  do`(tactic| repeat simp only [Set.mem_insert_iff,Set.mem_singleton_iff,true_or,or_true] at $t1)
 
 
 macro "is_mem2" : tactic =>
