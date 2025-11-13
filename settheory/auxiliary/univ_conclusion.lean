@@ -6,11 +6,11 @@ import settheory.setTheorems
 
 #check Finset.card_eq_one
 #check Finset.card_le_one_iff
-theorem two_in_card_eq_one {K : Type} {A B : K} {S : (Finset K)} (h : S.card =1) (AinS : A ∈ S) ( BinS : B ∈ S) : A=B := by 
+theorem two_in_card_eq_one {K : Type} {A B : K} {S : (Finset K)} (h : S.card =1) (AinS : A ∈ S) ( BinS : B ∈ S) : A=B := by
   rw [Finset.card_eq_one] at h
-  have ⟨a,ha⟩ := h 
+  have ⟨a,ha⟩ := h
   rw [ha] at AinS
-  rw [ha] at BinS
+  rw[ha] at BinS
   mem_finset at BinS
   mem_finset at AinS
   rw [←BinS] at AinS
@@ -87,12 +87,25 @@ theorem set_full3
 #check mem_of_eq_singleton
 theorem one_in_of_card_eq_one
 {K : Type}
-{A B C : K} {S : Finset K}  (U : Set.univ = ({A,B,C} : Set K)) (h : S.card = 1)
+{inst : DecidableEq K}
+{inst2 : Fintype K}
+{A B C : K}
+{S : Finset K}  (U : Finset.univ = {A,B,C}) (h : S.card = 1)
 (AneB : A ≠ B)
 (BneC : B ≠ C)
 (AneC : A ≠ C)
 : A ∈ S ∧ B ∉ S ∧ C ∉ S ∨ A ∉ S ∧ B ∈ S ∧ C ∉ S ∨ A ∉ S ∧ B ∉ S ∧ C ∈ S := by
-  rw [card_eq_one_iff_singletons_univ A B C U ] at h  
+  rw [Finset.card_eq_one] at h
+  have ⟨a,h'⟩ := h 
+  have U' : S ⊆ Finset.univ := by exact Finset.subset_univ S
+  rw [U] at U'
+  rw [h'] at U'
+  simp at U'
+  have : a ∈ S := by exact mem_of_eq_singleton h'
+  aesop
+
+  /-
+  rw [card_eq_one_iff_singletons_univ A B C U ] at h
   rcases h with h_1|h_1
   · left
     constructor
@@ -118,12 +131,15 @@ theorem one_in_of_card_eq_one
       · constructor
         · exact not_in_of_singleton h BneC
         · exact mem_of_eq_singleton h
+  -/
 
 theorem all2_in_one_other_empty 
 {K : Type}
 {A B : K}
-{inst : Fintype K}
-{inst2 : DecidableEq K} {S S' : Finset K} (h : S ∩ S' = ∅)(all : ∀(x:K), x = A ∨ x = B) (hA : A ∈ S) (hB : B ∈ S) : S' = ∅ := by 
+{inst : Fintype K} {inst2 : DecidableEq K}
+{S S' : Finset K}
+(h : S ∩ S' = ∅) (all : ∀ (x : K), x = A ∨ x = B) (hA : A ∈ S) (hB : B ∈ S)
+: S' = ∅ := by 
   have : S = (Finset.univ) := by 
     have := (@univ_iff_all2 K inst inst2  ).mpr all
     rw [this]
@@ -142,7 +158,7 @@ theorem all2_in_one_other_empty
   rw [Finset.inter_univ] at h
   assumption
 
-  --by_contra nonemp 
+  --by_contra nonemp
 ----  have := (not_iff_not.mpr Finset.not_nonempty_iff_eq_empty).mpr nonemp
   --rw [(not_iff_not.mpr Finset.not_nonempty_iff_eq_empty).symm] at nonemp
 
@@ -159,15 +175,14 @@ theorem all2_in_one_other_empty
 theorem all3_in_one_other_empty 
 {K : Type}
 {inst : DecidableEq K} {A B C : K} {S S' : Finset K}
-{all3 : ∀(x:K), x=A ∨ x=B ∨ x=C}
+{all3 : ∀ (x : K), x = A ∨ x = B ∨ x = C}
 (hA : A ∈ S)
 (hB : B ∈ S)
 (hC : C ∈ S)
-(h : S ∩ S'= ∅ )
-: S'=∅ := by 
-  rw [Finset.eq_empty_iff_forall_not_mem] 
-  intro x
-  intro xInS'
+(h : S ∩ S' = ∅)
+: S'=∅ := by
+  rw [Finset.eq_empty_iff_forall_not_mem]
+  intro x xInS'
   rcases all3 x with h_1|h_2
   · rw [h_1] at xInS'
     exact disjoint_finset h hA xInS'
@@ -177,95 +192,81 @@ theorem all3_in_one_other_empty
     · rw [h_4] at xInS'
       exact disjoint_finset h hC xInS'
 
--- if one is empty then the other eq_all
-theorem S_union_S'_eq_univ
-{K : Type}
-{inst : DecidableEq K} {inst2 : Fintype K} {A B C : K} {S S' : Finset K}
-(all3 : ∀(x:K), x=A ∨ x=B ∨ x=C)
-(Or : ∀(x:K), x ∈ S ∨ x ∈ S')
-: S ∪ S' = Finset.univ := by  
+#check Finset.Subset.antisymm
   #check Set.eq_of_subset_of_subset
+  #check Finset.eq_of_superset_of_card_ge
   #check Finset.eq_of_subset_of_card_le
   #check Finset.card_le_univ
   #check Finset.subset_univ
-  --apply Finset.eq_of_subset_of_card_le
-  --· apply Finset.subset_univ
-  --· sorry
 
-  apply Finset.ext
-  intro a
-  constructor
-  · #check Finset.mem_univ
-    intro 
-    apply Finset.mem_univ
-  · have : S ∪ S' = {A,B,C} := by 
-      apply Finset.ext 
-      intro b
-      constructor
-      · intro t
-        mem_finset
-        exact all3 b
-      · intro t
-        #check Finset.mem_union 
-        rw [Finset.mem_union]
-        exact Or b
+theorem S_union_S'_eq_univ
+{K : Type}
+{inst : DecidableEq K} {inst2 : Fintype K}
+{S S' : Finset K}
+(Or : ∀ (x : K), x ∈ S ∨ x ∈ S')
+: S ∪ S' = Finset.univ := by  
+  ext a
+  simp
+  exact Or a
 
-    intro inU
-    rw [this]
-    #check univ_iff_all
-    have Ueq : Finset.univ ={A,B,C}:= (univ_iff_all).mpr all3
-    rw [←Ueq]
-    trivial
+theorem S_union_S'_eq_univ_explicit
+{K : Type}
+{inst : DecidableEq K} {inst2 : Fintype K}
+{A B C : K} {S S' : Finset K}
+(Or : ∀ (x : K), x ∈ S ∨ x ∈ S')
+(all3 : ∀ (x : K), x = A ∨ x = B ∨ x = C)
+: S ∪ S' = {A,B,C} := by
+  have : S ∪ S' = Finset.univ := by apply S_union_S'_eq_univ Or
+  rw [this]
+  exact univ_iff_all.mpr all3
 
+
+#check Finset.empty_union
 theorem empty_eq_all 
 {K : Type}
 {inst : DecidableEq K} {A B C : K} {S S' : Finset K}
 {inst2 : Fintype K}
-{all3 : ∀(x:K), x=A ∨ x=B ∨ x=C}
-{Or : ∀(x:K), x ∈ S ∨ x ∈ S'}
-(Semp : S= ∅ ) : S' ={A,B,C} := by 
-  #check S_union_S'_eq_univ
-  have : S ∪ S' = Finset.univ := S_union_S'_eq_univ all3 Or
-  #check univ_iff_all
-  have U: Finset.univ = {A,B,C} := (univ_iff_all).mpr all3
-  rw [U] at this
-  rw [Semp] at this
-  simp at this
-  #check Finset.empty_union
+{all3 : ∀ (x : K), x = A ∨ x = B ∨ x = C}
+{Or : ∀ (x : K), x ∈ S ∨ x ∈ S'}
+(Semp : S = ∅) : S' ={A,B,C} := by 
+  have : S ∪ S' = {A,B,C} :=by 
+    (expose_names; apply S_union_S'_eq_univ_explicit Or all3)
+    assumption
+  simp [Semp] at this
   assumption
 
 theorem all3_in_one_other_eq_all 
 {K : Type}
-{inst : DecidableEq K} {A B C : K} {S S' : Finset K}
-{all3 : ∀(x:K), x=A ∨ x=B ∨ x=C}
+{inst : DecidableEq K} {A B C : K} {S : Finset K}
+{all3 : ∀ (x : K), x = A ∨ x = B ∨ x = C}
 (hA : A ∈ S)
 (hB : B ∈ S)
 (hC : C ∈ S)
-(h : S ∩ S'= ∅ ) : S={A,B,C} := by 
-  apply Finset.ext
-  intro a
+: S={A,B,C} := by 
+  ext a
+  mem_finset
   constructor
-  · intro aInS
-    -- S is the whole universe, so S' empty
-    -- S = Finset.univ , Finset.univ ∩ S' = ∅ #check Finset.inter
-    sorry
-  · sorry 
+  · aesop
+  · intro h'
+    rcases all3 a with h|h|h
+    repeat rw [h] ; assumption
 
+#check Finset.ext_iff
 theorem everyone_in_set_eq 
 {K : Type}
-{inst : DecidableEq K} {S : Finset K} {A B C : K} (all3 : ∀ (x : K), x = A ∨ x = B ∨ x = C) : (A ∈ S ∧ B ∈ S ∧ C ∈ S) ↔ (S = ({A,B,C} : Finset K) ) := by 
+{inst : DecidableEq K} {S : Finset K} {A B C : K} 
+  (all3 : ∀ (x : K), x = A ∨ x = B ∨ x = C) 
+  : (A ∈ S ∧ B ∈ S ∧ C ∈ S) ↔ (S = ({A,B,C} : Finset K) ) := by 
   constructor
   · intro allS
-    #check Finset.ext_iff
-    apply Finset.ext
-    intro a
+    ext a
     constructor
     · intro aKn
-      rcases all3 a with h|h|h
-<;> rw [h] ; mem_finset
-
+      mem_finset
+      exact all3 a
     · intro aIn
-      rcases all3 a with h|h|h
+      mem_finset at aIn
+      rcases aIn with h|h|h
 <;> rw [h]
       · exact allS.left
       · exact allS.right.left
@@ -273,46 +274,40 @@ theorem everyone_in_set_eq
 
   · intro SEveryone
     rw [SEveryone]
-    constructor <;> try constructor
-    mem_finset
+    aesop
 
 theorem all_in_one
   {Inhabitant : Type}
   {inst : DecidableEq Inhabitant}
   {A B C : Inhabitant}
   {S : Finset Inhabitant} 
-  {all3 : ∀(x : Inhabitant), x = A ∨ x = B ∨ x = C}
+  {all3 : ∀ (x : Inhabitant), x = A ∨ x = B ∨ x = C}
   (hA : A ∈ S)
   (hB : B ∈ S)
   (hC : C ∈ S)
   : S = {A,B,C}
   := by
-    #check Finset.eq_of_subset_of_card_le 
+    #check Finset.eq_of_subset_of_card_le
     exact (everyone_in_set_eq all3).mp ⟨hA,hB,hC⟩
 
-
-theorem two_in_one_other_nonemp 
+theorem not_all_in_one_in_other 
 {K : Type}
 {inst : DecidableEq K} {A B C : K} {S S' : Finset K}
+{inst2 : Fintype K}
 (all : ∀ (x : K), x = A ∨ x = B ∨ x = C)
-(hA : A ∈ S)
-(hB : B ∈ S)
-(Or : ∀(x:K), x ∈ S ∨ x ∈ S')
-(notall : S ≠ ({A,B,C} : Finset K) ) : S' ≠ ∅ := by 
-  -- union axiom is interesting here where S ∪ S' = {A,B,C}
+(Or : ∀ (x : K), x ∈ S ∨ x ∈ S')
+(notall : S ≠ ({A,B,C} : Finset K)) : S' ≠ ∅ := by
   intro S'emp
-  have hnC : C ∉ S := by 
-    intro hC
-    exact notall ((everyone_in_set_eq all).mp ⟨hA,⟨hB,hC⟩ ⟩  )
-  have : C ∈ S' := by exact notinleft_inright (Or C) hnC
-  rw [S'emp] at this
+  -- make into theorem
+  have : S ∪ S' = {A,B,C} := by
+    (expose_names; apply S_union_S'_eq_univ_explicit Or all)
+    assumption
+  simp [S'emp] at this
   contradiction
-
-
 
 theorem not_eq_singleton_of_not_mem
 {K : Type}
-{A : K} {S : Finset K} (h : A ∉ S) : S ≠ {A} := by 
+{A : K} {S : Finset K} (h : A ∉ S) : S ≠ {A} := by
   intro eq
   have := mem_of_eq_singleton eq
   contradiction
@@ -333,13 +328,11 @@ theorem already_full
   exfalso
   contradiction
 
-
 theorem full2_helper
 {K : Type}
 {A B C : K}
 (S : Finset K)
 {inst : DecidableEq K}
-{inst2 : Fintype K}
 (pair : S = {A,B})
 
 (AneB : A ≠ B)
@@ -355,7 +348,6 @@ theorem full2_helper
   contradiction
   symm at BneC
   contradiction
-
 }
 
 theorem full2

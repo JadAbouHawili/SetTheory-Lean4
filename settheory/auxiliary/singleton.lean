@@ -252,7 +252,6 @@ theorem singleton_iff_card_eq_one3
     right ; right
     assumption
 
-
 theorem not_eq_singleton_already_full
 {K : Type}
 {A B: K}
