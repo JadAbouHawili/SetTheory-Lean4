@@ -41,9 +41,9 @@ theorem univ_iff_all2
     intro hx
     rcases all x with h|h
     · rw [h]
-      is_mem
+      mem_finset
     · rw [h]
-      is_mem
+      mem_finset
     apply Finset.card_le_card
     apply Finset.subset_univ
 
@@ -52,31 +52,15 @@ theorem univ_iff_all2
 #check Set.subset_univ
 theorem set_subset_univ_explicit
 {Inhabitant : Type}
-{inst: DecidableEq Inhabitant}
+{inst : DecidableEq Inhabitant}
 {A B C : Inhabitant}
  {S : Finset Inhabitant}
- {inst : Fintype Inhabitant}
- (all3 : ∀(x : Inhabitant) , x = A ∨ x = B ∨ x = C)
+ (all3 : ∀ (x : Inhabitant), x = A ∨ x = B ∨ x = C)
 : S ⊆ ({A,B,C} : Finset Inhabitant) := by 
 
-  rw [(univ_iff_all).symm] at all3
-  rw [←all3]
-  exact Finset.subset_univ S
-/-
--- proof without going into using univ theorems , keep it , useful reasoning
-    have : S ⊆ {A,B,C} := by
-      intro x
-      intro xK
-      rcases all3 x with h_1|h_1
-      · rw [h_1]
-        is_mem
-      · rcases h_1 with h_2|h_2
-        · rw [h_2]
-          is_mem
-        · rw [h_2]
-          is_mem
-    assumption
--/
+  intro x xK
+  mem_finset
+  exact all3 x
 
 macro "by_universe" : tactic =>
   `(tactic| (apply set_subset_univ_explicit; assumption))

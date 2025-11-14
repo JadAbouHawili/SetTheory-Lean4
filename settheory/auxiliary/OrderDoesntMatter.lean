@@ -20,9 +20,6 @@ example
   perm
 }
 
--- need analysis of is_mem , is_mem as far as i remember is checking if the first element matches the claimed member and doing apply using Set.mem_insert to remove the top element and progress
-#check Set.mem_insert_iff
-#check Set.mem_insert
 example : x ∈ ({A, B,C} : Set Type) ↔ x = A ∨ x = B ∨ x = C := by {
   -- replaces mem_iff_or
   simp [Set.mem_insert_iff]
